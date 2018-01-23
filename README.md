@@ -1,2 +1,2 @@
 # feed-aggregator
-Aggregate data from disparate AJAX sources.
+Load and aggregate data from disparate sources.
