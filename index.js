@@ -150,7 +150,7 @@ class FeedSource {
     }
 }
 
-class FeedAggregator extends mix().with(EventEmitterMixin) {
+module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMixin) {
     constructor(opts) {
         super(opts);
         this.dataSources = [];
@@ -219,5 +219,3 @@ class FeedAggregator extends mix().with(EventEmitterMixin) {
             });
     }
 }
-
-module.exports = FeedAggregator;
