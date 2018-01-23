@@ -1,0 +1,27 @@
+{
+  "name": "feed-aggregator",
+  "version": "1.0.0",
+  "description": "Load and aggregate data from disparate sources.",
+  "main": "index.js",
+  "dependencies": {
+    "array-compact": "^1.0.0",
+    "defaults-es6": "^1.1.0",
+    "event-emitter-mixin": "^1.0.1",
+    "array-uniq": "^1.0.3",
+    "mixwith": "^0.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gryphonmyers/feed-aggregator.git"
+  },
+  "author": "Gryphon Myers",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gryphonmyers/feed-aggregator/issues"
+  },
+  "homepage": "https://github.com/gryphonmyers/feed-aggregator#readme"
+}
