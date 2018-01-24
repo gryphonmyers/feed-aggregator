@@ -1,4 +1,4 @@
-var mix = require('mixwith').mix;
+var mix = require('mixwith-es5').mix;
 var EventEmitterMixin = require('event-emitter-mixin');
 var uniq = require('array-uniq');
 var compact = require('array-compact');
