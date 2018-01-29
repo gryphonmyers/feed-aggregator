@@ -6,7 +6,7 @@ var defaults = require('defaults-es6');
 
 class FeedEntry {
     constructor(opts) {
-        this.index = opts.index;
+        this.indexFunc = opts.indexFunc;
         this.originalEntry = opts.originalEntry;
         this.dataSourceName = opts.dataSourceName;
         this.params = opts.params;
@@ -80,9 +80,9 @@ class FeedFetcher {
                                                     return new FeedEntry({
                                                         dataSourceName: this.dataSourceName,
                                                         params: this.params,
-                                                        tags: this.entryTagsTransform ? this.entryTagsTransform.call(this, this.tags.slice(0), entry): this.tags,
+                                                        tags: this.entryTagsTransform ? this.entryTagsTransform.call(this, this.tags.slice(0), entry): this.tags.slice(0),
                                                         originalEntry: entry,
-                                                        index: this.indexFunc.call(this, entry, ii, this.loadedEntries.map(loadedEntry => loadedEntry.originalEntry).concat(loadedEntries))
+                                                        indexFunc: this.indexFunc
                                                     });
                                                 });
                                         }))
@@ -203,8 +203,19 @@ module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMix
                 fetcherResults = compact(fetcherResults);
 
                 var newSet = fetcherResults
-                    .reduce((allResults, currResult) => allResults.concat(currResult.entries), [])
-                    .sort((a, b) => a.index - b.index);
+                    .reduce((allResults, currResult) => allResults.concat(currResult.entries), []);
+
+                var originalEntries = newSet.map(item => item.originalEntry);
+                
+                newSet = newSet
+                    .map((entry,ii) => {
+                        return {
+                            index: entry.indexFunc.call(this, entry.originalEntry, ii, originalEntries),
+                            value: entry
+                        };
+                    })
+                    .sort((a,b) => a.index - b.index)
+                    .map(obj => obj.value)
 
                 var isDepleted = fetcherResults.map(result => result.isDepleted) && newSet.length <= target;
 
