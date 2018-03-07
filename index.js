@@ -217,7 +217,7 @@ module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMix
                     .sort((a,b) => a.index - b.index)
                     .map(obj => obj.value)
 
-                var isDepleted = fetcherResults.map(result => result.isDepleted) && newSet.length <= target;
+                var isDepleted = fetcherResults.every(result => result.isDepleted) && newSet.length <= target;
 
                 newSet = newSet.slice(0, target);
 
