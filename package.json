@@ -1,6 +1,6 @@
 {
   "name": "feed-aggregator",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Load and aggregate data from disparate sources.",
   "main": "index.js",
   "dependencies": {
