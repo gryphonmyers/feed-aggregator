@@ -157,6 +157,7 @@ module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMix
         this.loadBuffer = opts.loadBuffer || 8;
         this.defaultParams = opts.params || {};
         this.entryTagsTransform = opts.entryTagsTransform;
+        this.tieBreakerFunc = opts.tieBreakerFunc;
         this.currentSet = [];
         this.sets = {};
 
@@ -214,7 +215,27 @@ module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMix
                             value: entry
                         };
                     })
-                    .sort((a,b) => a.index - b.index)
+                    .sort((a,b) => {
+                        if (a.index === b.index) {
+                            if (!this.tieBreakerFunc) {
+                                console.warn('There are entries in this feed that have the same indices! Please supply a tiebreaker function, otherwise you will experience unstable sorts.');
+                            } else {
+                                var tieBreakerVals = this.tieBreakerFunc.call(this, a.value, b.value, a.index);
+                                if (!Array.isArray(tieBreakerVals) || tieBreakerVals.length !== 2 || tieBreakerVals.some(val => !(typeof val === 'string' || typeof val === 'number'))) {
+                                    console.error('Tie-breaker func should return an array with two values to compare.');
+                                } else {
+                                    if (tieBreakerVals[0] > tieBreakerVals[1]) {
+                                        return 1;
+                                    } else if (tieBreakerVals[0] < tieBreakerVals[1]) {
+                                        return -1;
+                                    } else if (tieBreakerVals[0] == tieBreakerVals[1]) {
+                                        console.warn('Tie-breaker func produced indeterminate values. Still an unstable sort.');
+                                    }
+                                }
+                            }                    
+                        }
+                        return a.index - b.index
+                    })
                     .map(obj => obj.value)
 
                 var isDepleted = fetcherResults.every(result => result.isDepleted) && newSet.length <= target;
