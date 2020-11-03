@@ -160,6 +160,8 @@ module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMix
         this.tieBreakerFunc = opts.tieBreakerFunc;
         this.currentSet = [];
         this.sets = {};
+        this.shouldDedupe = !!opts.shouldDedupe;
+        this.uniqueId = opts.uniqueId || "_id";
 
         if (opts.dataSources) this.addDataSources(opts.dataSources);
     }
@@ -202,9 +204,22 @@ module.exports = class extends mix(class FeedAggregator {}).with(EventEmitterMix
                 var activeSources = this.dataSources.filter((val, key) => fetcherResults[key]);
 
                 fetcherResults = compact(fetcherResults);
+                const setIds = {};
 
                 var newSet = fetcherResults
-                    .reduce((allResults, currResult) => allResults.concat(currResult.entries), []);
+                    .reduce((allResults, currResult) => {
+                        currResult.entries = currResult.entries.filter(entry => {
+                            if (!this.shouldDedupe) return true;
+                            
+                            if (!setIds[entry.originalEntry[this.uniqueId]]) {
+                                setIds[entry.originalEntry[this.uniqueId]] = true;
+                                return true;
+                            }
+
+                            return false;
+                        })
+                        return allResults.concat(currResult.entries);
+                    }, []);
 
                 var originalEntries = newSet.map(item => item.originalEntry);
                 
